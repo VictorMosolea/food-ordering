@@ -1,34 +1,34 @@
 #include <stdio.h>
-
+#include <string.h>
 
 
 int main() {
-    int cutlerychoice;
+    int cutleryChoice;
 
-    char YN[][4]={"Yes","No"};
+    char YesNo[][4]={"Yes","No"};
 
     int sum=0;
 
-    int drinkschoice;
+    int drinksChoice;
 
-    int nrofFoods=3;
+    int nrOfFoods=3;
 
-    int nrofDrinks=4;
+    int nrOfDrinks=5;
 
-    char foodoptions[][10] = {"Pizza", "Pasta", "Salad"};
+    char foodOptions[][10] = {"Pizza", "Pasta", "Salad"};
 
-    int foodschoice;
+    int foodsChoice;
 
     char choice;
 
-    int specialitychoice;
+    int specialityChoice;
 
-    char drink[][10]= {"Fanta","Cola","Lemonade","Water","No, thanks"};
+    char drink[][10]= {"Fanta","Cola","Lemonade","Water","No"};
 
-    int drinkprices[]= {5,4,8,6};
+    int drinkPrices[]= {5,4,8,6,0};
 
     char foods[3][3][11] = {
-            {"Margherita", "Diavola", "Carbonara"},
+            {"Margherita", "Diavola", "Caro"},
             {"Canneloni",  "Ravioli", "Lasagna"},
             {"Nicoise",    "Cobb",    "Caesar"}
     };
@@ -52,53 +52,53 @@ int main() {
     {
         printf("Please choose the food you feel like eating today:\n");
 
-        for (int i = 1; i <= nrofFoods; i++) {
+        for (int i = 1; i <= nrOfFoods; i++) {
             putchar('a' + i - 1);
-            printf(") %s\n", foodoptions[i - 1]);
+            printf(") %s\n", foodOptions[i - 1]);
         }
         printf("d)Go back\n>");
         choice = getchar();
         getchar();
-        foodschoice = choice - 'a';
-        if (foodschoice == 3)
+        foodsChoice = choice - 'a';
+        if (foodsChoice == 3)
             goto Intro;
         else
-            goto Foodpick;
+            goto FoodPick;
     };
 
-    Foodpick:
+    FoodPick:
     {
-        printf("Please choose the type of %s:\n",foodoptions[foodschoice]);
-        for(int i=1;i<=nrofFoods;i++) {
+        printf("Please choose the type of %s:\n",foodOptions[foodsChoice]);
+        for(int i=1;i<=nrOfFoods;i++) {
                 putchar('a'+i-1);
-                printf(") %s %d\n",foods[foodschoice][i-1], prices[foodschoice][i-1]);
+                printf(") %s %d\n",foods[foodsChoice][i-1], prices[foodsChoice][i-1]);
             }
             printf("d)Go back\n>");
             choice=getchar();
             getchar();
-              specialitychoice=choice-'a';
-            if(specialitychoice==3)
+              specialityChoice=choice-'a';
+            if(specialityChoice==3)
                 goto Food;
             else
-                goto Drinkpick;
+                goto DrinkPick;
 
     };
 
-    Drinkpick:
+    DrinkPick:
     {
-        printf("Please choose a drink to go with your %s:\n",foodoptions[foodschoice]);
-        for(int i=1;i<=nrofDrinks;i++) {
+        printf("Please choose a drink to go with your %s:\n",foodOptions[foodsChoice]);
+        for(int i=1;i<=nrOfDrinks;i++) {
             putchar('a' + i - 1);
-            printf(") %s %d\n", drink[i-1],drinkprices[i-1]);
+            printf(") %s", drink[i-1]);
+            if(drinkPrices[i-1]>0) printf(" %d\n",drinkPrices[i-1]);
         }
-        printf("e) No, thanks\n");
-        printf("f) Go back\n>");
+        printf("\nf) Go back\n>");
         choice = getchar();
         getchar();
-        drinkschoice = choice-'a';
-        if(drinkschoice==5)
-            goto Foodpick;
-        else if(drinkschoice!=4)
+        drinksChoice = choice-'a';
+        if(drinksChoice==5)
+            goto FoodPick;
+        else if(drinksChoice!=4)
             goto Cutlery;
 
     };
@@ -107,16 +107,16 @@ int main() {
         printf("Do you want any cutlery?\n");
         for(int i=0;i<2;i++){
             putchar('a'+i);
-            printf(") %s\n",YN[i]);
+            printf(") %s\n",YesNo[i]);
         }
         printf("c) Go back\n>");
         choice=getchar();
         getchar();
-        cutlerychoice=choice-'a';
-        if(cutlerychoice==2)
+        cutleryChoice=choice-'a';
+        if(cutleryChoice==2)
         {
-            sum=sum-drinkprices[drinkschoice];
-            goto Drinkpick;
+            sum=sum-drinkPrices[drinksChoice];
+            goto DrinkPick;
         }
         else goto End;
     };
@@ -127,11 +127,12 @@ int main() {
         printf("This is your order:\n-------------------\n");
         printf("Name: %s\n",Username);
         printf("Food items:\n");
-        printf("---%s %s: %d\n",foodoptions[foodschoice],foods[foodschoice][specialitychoice],prices[foodschoice][specialitychoice]);
-        printf("---%s: %d\n",drink[drinkschoice],drinkprices[drinkschoice]);
-        printf("Cutlery: %s\n",YN[cutlerychoice]);
+        printf("---%s %s: %d\n",foodOptions[foodsChoice],foods[foodsChoice][specialityChoice],prices[foodsChoice][specialityChoice]);
+        printf("---Drink: %s: %d\n",drink[drinksChoice],drinkPrices[drinksChoice]);
+        printf("Cutlery: %s\n",YesNo[cutleryChoice]);
+        if(strlen(userInput)>0)
         printf("Additional info: %s\n",userInput);
-        sum=prices[foodschoice][specialitychoice]+drinkprices[drinkschoice];
+        sum=prices[foodsChoice][specialityChoice]+drinkPrices[drinksChoice];
         printf("Payment amount: %d\n",sum);
         printf("-------------------\n");
         printf("a) Confirm order\nb) Go back\n>");
