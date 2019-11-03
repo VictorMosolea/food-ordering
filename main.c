@@ -31,6 +31,7 @@ int main() {
     char userInput[20];
     Intro:
        signIn(Username, Password);
+
     Food:
     {
         printFoodOptions(nrOfFoods, foodOptions);
@@ -75,6 +76,7 @@ int main() {
         }
         else goto End;
     };
+    
     End:
     {   printf("Any additional info?\n");
         gets(userInput);

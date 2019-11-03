@@ -2,7 +2,6 @@
 // Created by Victor on 11/3/2019.
 //
 #include <stdio.h>
-
 #define MAX_FOOD_NAME 10
 #define MAX_SPECIALITY_NAME 11
 #define MAX_NR_FOODS 3

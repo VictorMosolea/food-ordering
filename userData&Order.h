@@ -1,7 +1,6 @@
 //
 // Created by Victor on 11/3/2019.
 //
-
 #ifndef FOOD_ORDERING_USERDATA_ORDER_H
 #define FOOD_ORDERING_USERDATA_ORDER_H
 #define MAX_FOOD_NAME 10
