@@ -10,7 +10,7 @@ int main() {
     int sum=0;
     int drinksChoice;
     int nrOfFoods=3;
-    int nrOfDrinks=5;
+    int nrOfDrinks=4;
     char foodOptions[][10] = {"Pizza", "Pasta", "Salad"};
     int foodsChoice;
     int specialityChoice;
@@ -44,7 +44,7 @@ int main() {
 
     FoodPick:
     {
-        printFoodSpecialities(foodOptions, foodsChoice, nrOfFoods, foods, prices);
+        printFoodSpecialities(foodOptions[foodsChoice], nrOfFoods, foods[foodsChoice], prices[foodsChoice]);
            specialityChoice=getChoiceIndex();
             if(specialityChoice==3)
                 goto Food;
@@ -55,7 +55,7 @@ int main() {
 
     DrinkPick:
     {
-        printDrinkOptions(foodOptions, foodsChoice, nrOfDrinks, drinkPrices, drink);
+        printDrinkOptions(foodOptions[foodsChoice], nrOfDrinks, drinkPrices, drink);
 
         drinksChoice = getChoiceIndex();
         if(drinksChoice==5)
@@ -66,24 +66,22 @@ int main() {
     };
     Cutlery:
     {
-        printCutleryOptions(YesNo);
+        printCutleryOptions();
 
-        cutleryChoice=getChoiceIndex();
-        if(cutleryChoice==2)
-        {
-            sum=sum-drinkPrices[drinksChoice];
+        cutleryChoice = getChoiceIndex();
+        if (cutleryChoice == 2)
             goto DrinkPick;
-        }
         else goto End;
+
     };
-    
+
     End:
     {   printf("Any additional info?\n");
         gets(userInput);
-        printUserOrder(Username, foodOptions, foodsChoice, foods, specialityChoice, YesNo, prices, drink, drinksChoice,
-                cutleryChoice, sum, userInput, drinkPrices);
+        printUserOrder(Username, foodOptions[foodsChoice], foods[foodsChoice][specialityChoice],
+                YesNo[cutleryChoice], prices[foodsChoice][specialityChoice], drink[drinksChoice], sum, userInput, drinkPrices[drinksChoice]);
         printf("a) Confirm order\nb) Go back\n>");
-        if ('a' != getchar())
+        if (getchar()=='b')
             goto Cutlery;
         else
             printf("Order confirmed! Thank you for buying from us, %s!", Username);
