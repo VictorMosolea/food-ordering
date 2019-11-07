@@ -12,8 +12,14 @@ int main() {
     char foodOptions[3][MAX_FOOD_NAME] = {"Pizza", "Pasta", "Salad"};
     char drink[][MAX_DRINK_NAME]= {"Fanta","Cola","Lemonade","Water","No"};
     int drinkPrices[]= {5,4,8,6,0};
-    char foods[3][3][MAX_FOOD_NAME] = {{"Margherita", "Diavola", "Caro"},{"Canneloni", "Ravioli", "Lasagna"},{"Nicoise", "Cobb", "Caesar"}};
-    int prices[3][3] = {{19, 16, 24},{23, 22, 28},{20, 21, 25}};
+    char foods[3][3][MAX_FOOD_NAME] = {{"Margherita", "Diavola", "Caro"},
+                                       {"Canneloni", "Ravioli", "Lasagna"},
+                                       {"Nicoise", "Cobb", "Caesar"}
+    };
+    int prices[3][3] = {{19, 16, 24},
+                        {23, 22, 28},
+                        {20, 21, 25}
+    };
     char Username[MAX_USERINPUT],Password[MAX_USERINPUT],userInput[MAX_USERINPUT];
     Intro: signIn(Username, Password);
     Food: {
