@@ -1,8 +1,8 @@
 //
 // Created by Victor on 11/3/2019.
 //
-#ifndef FOOD_ORDERING_PRINTOPTIONS_H
-#define FOOD_ORDERING_PRINTOPTIONS_H
+#ifndef FOOD_ORDERING_OPTIONS_H
+#define FOOD_ORDERING_OPTIONS_H
 #include "constants.h"
 
 void printFoodOptions(int nrOfFoods, char foodOptions[][MAX_FOOD_NAME]);
@@ -12,4 +12,4 @@ void printDrinkOptions(char foodOptions[MAX_FOOD_NAME], int nrOfDrinks, int drin
 void printCutleryOptions();
 
 
-#endif //FOOD_ORDERING_PRINTOPTIONS_H
+#endif //FOOD_ORDERING_OPTIONS_H
