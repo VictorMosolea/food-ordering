@@ -1,150 +1,76 @@
 #include <stdio.h>
-#include <string.h>
+#include "userData.h"
+#include "options.h"
+#include "order.h"
+#include "constants.h"
 
+int getChoiceIndex();
 
 int main() {
-    int cutleryChoice;
-
+    int cutleryChoice, drinksChoice, nrOfFoods=3, nrOfDrinks=4, foodsChoice, specialityChoice, sum=0;
     char YesNo[][4]={"Yes","No"};
-
-    int sum=0;
-
-    int drinksChoice;
-
-    int nrOfFoods=3;
-
-    int nrOfDrinks=5;
-
-    char foodOptions[][10] = {"Pizza", "Pasta", "Salad"};
-
-    int foodsChoice;
-
-    char choice;
-
-    int specialityChoice;
-
-    char drink[][10]= {"Fanta","Cola","Lemonade","Water","No"};
-
+    char foodOptions[3][MAX_FOOD_NAME] = {"Pizza", "Pasta", "Salad"};
+    char drink[][MAX_DRINK_NAME]= {"Fanta","Cola","Lemonade","Water","No"};
     int drinkPrices[]= {5,4,8,6,0};
-
-    char foods[3][3][11] = {
-            {"Margherita", "Diavola", "Caro"},
-            {"Canneloni",  "Ravioli", "Lasagna"},
-            {"Nicoise",    "Cobb",    "Caesar"}
+    char foods[3][3][MAX_FOOD_NAME] = {{"Margherita", "Diavola", "Caro"},
+                                       {"Canneloni", "Ravioli", "Lasagna"},
+                                       {"Nicoise", "Cobb", "Caesar"}
     };
-    int prices[3][3] = {
-            {19, 16, 24},
-            {23, 22, 28},
-            {20, 21, 25}
+    int prices[3][3] = {{19, 16, 24},
+                        {23, 22, 28},
+                        {20, 21, 25}
     };
-    char Username[20];
-    char Password[20];
-    Intro:
-    {   sum=0;
-        printf("Welcome to Food Thingies!\n");
-        printf("Please sign in to continue\n");
-        printf("---Username:\n>");
-        gets(Username);
-        printf("---Password:\n>");
-        gets(Password);
-    };
-    Food:
-    {
-        printf("Please choose the food you feel like eating today:\n");
-
-        for (int i = 1; i <= nrOfFoods; i++) {
-            putchar('a' + i - 1);
-            printf(") %s\n", foodOptions[i - 1]);
-        }
-        printf("d)Go back\n>");
-        choice = getchar();
-        getchar();
-        foodsChoice = choice - 'a';
-        if (foodsChoice == 3)
+    char Username[MAX_USERINPUT],Password[MAX_USERINPUT],userInput[MAX_USERINPUT];
+    Intro: signIn(Username, Password);
+    Food: {
+    printFoodOptions(nrOfFoods,foodOptions);
+        foodsChoice=getChoiceIndex();
+        if (foodsChoice == nrOfFoods)
             goto Intro;
-        else
-            goto FoodPick;
+        else goto FoodPick;
     };
-
-    FoodPick:
-    {
-        printf("Please choose the type of %s:\n",foodOptions[foodsChoice]);
-        for(int i=1;i<=nrOfFoods;i++) {
-                putchar('a'+i-1);
-                printf(") %s %d\n",foods[foodsChoice][i-1], prices[foodsChoice][i-1]);
-            }
-            printf("d)Go back\n>");
-            choice=getchar();
-            getchar();
-              specialityChoice=choice-'a';
-            if(specialityChoice==3)
+    FoodPick: {
+        printFoodSpecialities(foodOptions[foodsChoice], nrOfFoods, foods[foodsChoice], prices[foodsChoice]);
+           specialityChoice=getChoiceIndex();
+            if(specialityChoice==nrOfFoods)
                 goto Food;
-            else
-                goto DrinkPick;
-
-    };
-
-    DrinkPick:
-    {
-        printf("Please choose a drink to go with your %s:\n",foodOptions[foodsChoice]);
-        for(int i=1;i<=nrOfDrinks;i++) {
-            putchar('a' + i - 1);
-            printf(") %s", drink[i-1]);
-            if(drinkPrices[i-1]>0) printf(" %d\n",drinkPrices[i-1]);
-        }
-        printf("\nf) Go back\n>");
-        choice = getchar();
-        getchar();
-        drinksChoice = choice-'a';
-        if(drinksChoice==5)
+            else goto DrinkPick;
+       };
+    DrinkPick: {
+        printDrinkOptions(foodOptions[foodsChoice], nrOfDrinks, drinkPrices, drink);
+        drinksChoice=getChoiceIndex();
+        if(drinksChoice==nrOfDrinks+1)
             goto FoodPick;
-        else if(drinksChoice!=4)
-            goto Cutlery;
-
-    };
-    Cutlery:
-    {
-        printf("Do you want any cutlery?\n");
-        for(int i=0;i<2;i++){
-            putchar('a'+i);
-            printf(") %s\n",YesNo[i]);
-        }
-        printf("c) Go back\n>");
-        choice=getchar();
-        getchar();
-        cutleryChoice=choice-'a';
-        if(cutleryChoice==2)
-        {
-            sum=sum-drinkPrices[drinksChoice];
+        else goto Cutlery;
+       };
+    Cutlery: {
+        printCutleryOptions();
+        cutleryChoice=getChoiceIndex();
+        if (cutleryChoice==2)
             goto DrinkPick;
-        }
         else goto End;
-    };
-    End:
-    {   char userInput[20];
-        printf("Any additional info?\n>");
+       };
+    End: {
+        printf("Any additional info?\n");
         gets(userInput);
-        printf("This is your order:\n-------------------\n");
-        printf("Name: %s\n",Username);
-        printf("Food items:\n");
-        printf("---%s %s: %d\n",foodOptions[foodsChoice],foods[foodsChoice][specialityChoice],prices[foodsChoice][specialityChoice]);
-        printf("---Drink: %s: %d\n",drink[drinksChoice],drinkPrices[drinksChoice]);
-        printf("Cutlery: %s\n",YesNo[cutleryChoice]);
-        if(strlen(userInput)>0)
-        printf("Additional info: %s\n",userInput);
-        sum=prices[foodsChoice][specialityChoice]+drinkPrices[drinksChoice];
-        printf("Payment amount: %d\n",sum);
-        printf("-------------------\n");
+        printUserOrder(Username, foodOptions[foodsChoice], foods[foodsChoice][specialityChoice],
+                YesNo[cutleryChoice], prices[foodsChoice][specialityChoice], drink[drinksChoice], sum, userInput, drinkPrices[drinksChoice]);
         printf("a) Confirm order\nb) Go back\n>");
-        choice=getchar();
-        getchar();
-        if(choice=='a')
-            printf("Order confirmed! Thank you for buying from us, %s!",Username);
-        if(choice=='b')
+        int choice=getChoiceIndex();
+        if (choice==1)
             goto Cutlery;
-
-    };
-
-
+        else printf("Order confirmed! Thank you for buying from us, %s!", Username);
+       };
     return 0;
 }
+
+int getChoiceIndex() {
+    char choice;
+    choice = getchar();
+    getchar();
+    int choiceIndex = choice - 'a';
+    return choiceIndex;
+}
+
+
+

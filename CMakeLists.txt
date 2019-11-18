@@ -3,4 +3,4 @@ project(food_ordering C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(food_ordering main.c)
+add_executable(food_ordering main.c options.h options.c order.h order.c userData.h userData.c constants.h)
