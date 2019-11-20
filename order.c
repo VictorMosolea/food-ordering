@@ -6,17 +6,17 @@
 #include "constants.h"
 
 void printUserOrder(char Username[MAX_USERINPUT], char foodOptions[MAX_FOOD_NAME], char foods[MAX_FOOD_NAME], char YesNo[],
-        int foodPrice, char drink[MAX_DRINK_NAME], int sum, char userInput[MAX_USERINPUT], int drinkPrice) {
+        double foodPrice, char drink[MAX_DRINK_NAME], char userInput[MAX_USERINPUT], double drinkPrice) {
     printf("This is your order:\n-------------------\n");
     printf("Name: %s\n",Username);
     printf("Food items:\n");
-    printf("---%s %s: %d\n",foodOptions, foods, foodPrice);
+    printf("---%s %s: %lf\n",foodOptions, foods, foodPrice);
     if(drinkPrice!=0)
-        printf("---Drink: %s: %d\n", drink, drinkPrice);
+        printf("---Drink: %s: %lf\n", drink, drinkPrice);
     printf("Cutlery: %s\n", YesNo);
     if(strlen(userInput)>0)
         printf("Additional info: %s\n", userInput);
-    sum=foodPrice+drinkPrice;
-    printf("Payment amount: %d\n", sum);
+    double sum=foodPrice+drinkPrice;
+    printf("Payment amount: %lf\n", sum);
     printf("-------------------\n");
 }

@@ -10,5 +10,6 @@
 #define MAX_DRINK_NAME 10
 #define MAX_NR_FOODS 3
 #define MAX_NR_DRINKS 4
+#define LOAD_DATA "Please load the data"
 
 #endif //FOOD_ORDERING_CONSTANTS_H
