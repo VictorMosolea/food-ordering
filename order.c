@@ -1,4 +1,4 @@
-//
+//[
 // Created by Victor on 11/6/2019.
 //
 #include <stdio.h>
@@ -10,13 +10,13 @@ void printUserOrder(char Username[MAX_USERINPUT], char foodOptions[MAX_FOOD_NAME
     printf("This is your order:\n-------------------\n");
     printf("Name: %s\n",Username);
     printf("Food items:\n");
-    printf("---%s %s: %lf\n",foodOptions, foods, foodPrice);
+    printf("---%s %s: %.2lf\n",foodOptions, foods, foodPrice);
     if(drinkPrice!=0)
-        printf("---Drink: %s: %lf\n", drink, drinkPrice);
+        printf("---Drink: %s: %.2lf\n", drink, drinkPrice);
     printf("Cutlery: %s\n", YesNo);
     if(strlen(userInput)>0)
         printf("Additional info: %s\n", userInput);
     double sum=foodPrice+drinkPrice;
-    printf("Payment amount: %lf\n", sum);
+    printf("Payment amount: %.2lf\n", sum);
     printf("-------------------\n");
 }
