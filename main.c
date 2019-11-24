@@ -5,14 +5,31 @@
 #include "constants.h"
 #include <stdlib.h>
 #include <string.h>
+#include "validPassword.h"
+#include "validUser.h"
 
 int getChoiceIndex();
 
 void readUntil(char *sentence, char *text, char sep, int *i);
 
-int fileExists(char *fname);
+int fileExists(char *fileName);
 
 int main() {
+    int cutleryChoice, drinksChoice, nrOfFoods, nrOfDrinks, foodsChoice, specialityChoice, introchoice, noOfUsers = 0;
+    char YesNo[][4] = {"Yes", "No"};
+    char ***userDataBase = (char ***) malloc(noOfUsers * sizeof(char **));
+    char s[MAX_LINE];
+    FILE *g;
+    g = fopen("userDataBase.txt", "a+");
+    while (feof(g) == 0) {
+        noOfUsers++;
+        userDataBase = realloc(userDataBase, noOfUsers * sizeof(char **));
+        userDataBase[noOfUsers - 1] = (char **) malloc(2 * sizeof(char *));
+        userDataBase[noOfUsers - 1][0] = (char *) malloc(MAX_USERNAME * sizeof(char));
+        userDataBase[noOfUsers - 1][1] = (char *) malloc(MAX_PASSWORD * sizeof(char));
+        fgets(s, MAX_LINE, g);
+        sscanf(s, "%s %s", userDataBase[noOfUsers - 1][0], userDataBase[noOfUsers - 1][1]);
+    }
     FILE *f;
     if (fileExists("data.txt") == 1)
         f = fopen("data.txt", "r");
@@ -20,22 +37,15 @@ int main() {
         f = stdin;
         fprintf(stdout, "%s\n", LOAD_DATA);
     }
-
-    int cutleryChoice, drinksChoice, nrOfFoods, nrOfDrinks, foodsChoice, specialityChoice, sum = 0;
-    char YesNo[][4] = {"Yes", "No"};
-
-    char s[MAX_USERINPUT];
-    fgets(s, MAX_USERINPUT, f);
+    fgets(s, MAX_LINE, f);
     sscanf(s, "%d", &nrOfFoods);
-
-
     char **foodOptions = (char **) malloc(nrOfFoods * sizeof(char *));
     char ***foods = (char ***) malloc(nrOfFoods * sizeof(char **));
     int *noOfSpecialities = (int *) malloc(nrOfFoods * sizeof(int));
     double **prices = (double **) malloc(nrOfFoods * sizeof(double *));
     for (int i = 0; i < nrOfFoods; i++) {
         foodOptions[i] = (char *) malloc(MAX_FOOD_NAME * sizeof(char));
-        fgets(s, MAX_USERINPUT, f);
+        fgets(s, MAX_LINE, f);
         s[strlen(s) - 1] = '\0';
         int j = 0;
         readUntil(foodOptions[i], s, ':', &j);
@@ -43,7 +53,7 @@ int main() {
         foods[i] = (char **) malloc((noOfSpecialities[i] + 1) * sizeof(char *));
         prices[i] = (double *) malloc((noOfSpecialities[i] + 1) * sizeof(double));
         while (j < strlen(s)) {
-            char dummy[MAX_USERINPUT];
+            char dummy[MAX_LINE];
             readUntil(dummy, s, '(', &j);
             foods[i] = realloc(foods[i], (noOfSpecialities[i] + 1) * sizeof(char *));
             prices[i] = realloc(prices[i], (noOfSpecialities[i] + 1) * sizeof(double));
@@ -54,17 +64,16 @@ int main() {
             noOfSpecialities[i]++;
         }
     }
-
-    fgets(s, MAX_USERINPUT, f);
+    fgets(s, MAX_LINE, f);
     sscanf(s, "%d", &nrOfDrinks);
     char **drink = (char **) malloc(nrOfDrinks * sizeof(char *));
     double *drinkPrices = (double *) malloc((nrOfDrinks + 1) * sizeof(double));
     drinkPrices[nrOfDrinks] = 0;
-    fgets(s, MAX_USERINPUT, f);
+    fgets(s, MAX_LINE, f);
     s[strlen(s) - 1] = '\0';
     int j = 0, i = 0;
     while (j < strlen(s)) {
-        char dummy[MAX_USERINPUT];
+        char dummy[MAX_LINE];
         drink[i] = (char *) malloc(MAX_DRINK_NAME * sizeof(char));
         readUntil(dummy, s, '(', &j);
         readUntil(drink[i], s, '-', &j);
@@ -72,10 +81,48 @@ int main() {
         sscanf(dummy, " %lf)", &drinkPrices[i]);
         i++;
     }
-
-    char Username[MAX_USERINPUT], Password[MAX_USERINPUT], userInput[MAX_USERINPUT];
+    char Username[MAX_USERNAME], Password[MAX_PASSWORD], userInput[MAX_LINE];
+    printf("Welcome to Food Thingies!\n");
     Intro:
-    signIn(Username, Password);
+    {
+        printf("%s\na) %s\nb) %s\n>", SIGN_IN_UP, SIGN_IN, SIGN_UP);
+        introchoice = getChoiceIndex();
+        if (introchoice == 0) {
+            signIn(Username, Password);
+            if (userNameExists(Username, noOfUsers, userDataBase) == 0)
+                goto Intro;
+            IncorrectPassword:
+            if (passwordCorrect(Password, noOfUsers, userDataBase) == 0) {
+                printf("Password:\n");
+                gets(Password);
+                goto IncorrectPassword;
+            }
+            goto Food;
+        } else
+            SignUp:
+            {
+                printf("%s\n", SIGNING_UP);
+                printf("Username:\n>");
+                gets(Username);
+                printf("Password:\n");
+                PasswordError:
+                printf(">");
+                gets(Password);
+                if (validUsername(Username, userDataBase, noOfUsers) == 0)
+                    goto SignUp;
+                if (passwordLongEnough(Password) == 0)
+                    goto PasswordError;
+                if (noUsernameInPassword(Username, Password) == 0)
+                    goto PasswordError;
+                if (passwordLacksChars(Password) == 1)
+                    goto PasswordError;
+                if (passwordContainsDigits(Password) == 0)
+                    goto PasswordError;
+                noOfUsers++;
+                fprintf(g, "\n%s %s", Username, Password);
+                goto Food;
+            };
+    };
     Food:
     {
         printFoodOptions(nrOfFoods, foodOptions);
@@ -134,7 +181,6 @@ int getChoiceIndex() {
 }
 
 void readUntil(char *sentence, char *text, char sep, int *i) {
-
     int j = 0;
     while (text[*i] != sep && (*i) < strlen(text)) {
         sentence[j] = text[*i];
@@ -145,9 +191,9 @@ void readUntil(char *sentence, char *text, char sep, int *i) {
     (*i)++;
 }
 
-int fileExists(char *fname) {
+int fileExists(char *fileName) {
     FILE *file;
-    if ((file = fopen(fname, "r"))) {
+    if ((file = fopen(fileName, "r"))) {
         fclose(file);
         return 1;
     }

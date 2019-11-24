@@ -11,16 +11,16 @@ void printFoodOptions(int nrOfFoods, char **foodOptions) {
         putchar('a' + i - 1);
         printf(") %s\n", foodOptions[i - 1]);
     }
-   printf("%c) Go back\n",'a'+nrOfFoods);
+    printf("%c) Go back\n", 'a' + nrOfFoods);
 }
 
 void printFoodSpecialities(char foodOptions[MAX_FOOD_NAME], int nrOfFoods, char **foods, double *prices) {
-    printf("Please choose the type of %s:\n",foodOptions);
-    for(int i=1;i<=nrOfFoods;i++) {
-        putchar('a'+i-1);
-        printf(") %s %.2lf\n",foods[i-1], prices[i-1]);
+    printf("Please choose the type of %s:\n", foodOptions);
+    for (int i = 1; i <= nrOfFoods; i++) {
+        putchar('a' + i - 1);
+        printf(") %s %.2lf\n", foods[i - 1], prices[i - 1]);
     }
-    printf("%c) Go back\n>",'a'+nrOfFoods);
+    printf("%c) Go back\n>", 'a' + nrOfFoods);
 }
 
 void printDrinkOptions(char foodOptions[MAX_FOOD_NAME], int nrOfDrinks, double *drinkPrices, char **drink) {
@@ -29,9 +29,9 @@ void printDrinkOptions(char foodOptions[MAX_FOOD_NAME], int nrOfDrinks, double *
         putchar('a' + i - 1);
         printf(") %s %.2lf\n", drink[i - 1], drinkPrices[i - 1]);
     }
-    printf("%c) No\n%c) Go back\n>",nrOfDrinks+'a',nrOfDrinks+1+'a');
+    printf("%c) No\n%c) Go back\n>", nrOfDrinks + 'a', nrOfDrinks + 1 + 'a');
 }
 
-    void printCutleryOptions() {
+void printCutleryOptions() {
     printf("Do you want any cutlery?\na) Yes\nb) No\nc) Go back\n");
 }
