@@ -7,6 +7,7 @@
 #include <string.h>
 #include "validPassword.h"
 #include "validUser.h"
+#include <ctype.h>
 
 int getChoiceIndex();
 
@@ -15,7 +16,7 @@ void readUntil(char *sentence, char *text, char sep, int *i);
 int fileExists(char *fileName);
 
 int main() {
-    int cutleryChoice, drinksChoice, nrOfFoods, nrOfDrinks, foodsChoice, specialityChoice, introchoice, noOfUsers = 0;
+    int cutleryChoice, drinksChoice, nrOfFoods, nrOfDrinks, foodsChoice, specialityChoice, introChoice, noOfUsers = 0;
     char YesNo[][4] = {"Yes", "No"};
     char ***userDataBase = (char ***) malloc(noOfUsers * sizeof(char **));
     char s[MAX_LINE];
@@ -53,14 +54,19 @@ int main() {
         foods[i] = (char **) malloc((noOfSpecialities[i] + 1) * sizeof(char *));
         prices[i] = (double *) malloc((noOfSpecialities[i] + 1) * sizeof(double));
         while (j < strlen(s)) {
-            char dummy[MAX_LINE];
-            readUntil(dummy, s, '(', &j);
+            char aux[MAX_LINE];
+            readUntil(aux, s, '(', &j);
             foods[i] = realloc(foods[i], (noOfSpecialities[i] + 1) * sizeof(char *));
             prices[i] = realloc(prices[i], (noOfSpecialities[i] + 1) * sizeof(double));
             foods[i][noOfSpecialities[i]] = (char *) malloc(MAX_FOOD_NAME * sizeof(char));
             readUntil(foods[i][noOfSpecialities[i]], s, '-', &j);
-            readUntil(dummy, s, ')', &j);
-            sscanf(dummy, " %lf", &prices[i][noOfSpecialities[i]]);
+            if (isalpha(s[j])) {
+                readUntil(aux, s, '-', &j);
+                strcat(foods[i][noOfSpecialities[i]], "-");
+                strcat(foods[i][noOfSpecialities[i]], aux);
+            }
+            readUntil(aux, s, ')', &j);
+            sscanf(aux, " %lf", &prices[i][noOfSpecialities[i]]);
             noOfSpecialities[i]++;
         }
     }
@@ -73,12 +79,17 @@ int main() {
     s[strlen(s) - 1] = '\0';
     int j = 0, i = 0;
     while (j < strlen(s)) {
-        char dummy[MAX_LINE];
+        char aux[MAX_LINE];
         drink[i] = (char *) malloc(MAX_DRINK_NAME * sizeof(char));
-        readUntil(dummy, s, '(', &j);
+        readUntil(aux, s, '(', &j);
         readUntil(drink[i], s, '-', &j);
-        readUntil(dummy, s, ',', &j);
-        sscanf(dummy, " %lf)", &drinkPrices[i]);
+        if (isalpha(s[j])) {
+            readUntil(aux, s, '-', &j);
+            strcat(drink[i], "-");
+            strcat(drink[i], aux);
+        }
+        readUntil(aux, s, ',', &j);
+        sscanf(aux, " %lf)", &drinkPrices[i]);
         i++;
     }
     char Username[MAX_USERNAME], Password[MAX_PASSWORD], userInput[MAX_LINE];
@@ -86,8 +97,8 @@ int main() {
     Intro:
     {
         printf("%s\na) %s\nb) %s\n>", SIGN_IN_UP, SIGN_IN, SIGN_UP);
-        introchoice = getChoiceIndex();
-        if (introchoice == 0) {
+        introChoice = getChoiceIndex();
+        if (introChoice == 0) {
             signIn(Username, Password);
             if (userNameExists(Username, noOfUsers, userDataBase) == 0)
                 goto Intro;
@@ -118,7 +129,6 @@ int main() {
                     goto PasswordError;
                 if (passwordContainsDigits(Password) == 0)
                     goto PasswordError;
-                noOfUsers++;
                 fprintf(g, "\n%s %s", Username, Password);
                 goto Food;
             };
@@ -169,6 +179,30 @@ int main() {
             goto Cutlery;
         else printf("Order confirmed! Thank you for buying from us, %s!", Username);
     };
+
+    for (i = 0; i < nrOfFoods; i++) {
+        for (j = 0; j < noOfSpecialities[i]; j++)
+            free(foods[i][j]);
+        free(prices[i]);
+        free(foodOptions[i]);
+        free(foods[i]);
+    }
+    free(prices);
+    free(foodOptions);
+    free(foods);
+
+    for (i = 0; i < nrOfDrinks; i++)
+        free(drink[i]);
+    free(drink);
+    free(drinkPrices);
+
+    for (i = 0; i < noOfUsers; i++) {
+        for (j = 0; j < 2; j++)
+            free(userDataBase[i][j]);
+        free(userDataBase[i]);
+    }
+    free(userDataBase);
+
     return 0;
 }
 
@@ -199,6 +233,8 @@ int fileExists(char *fileName) {
     }
     return 0;
 }
+
+
 
 
 
