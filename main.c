@@ -60,7 +60,7 @@ int main() {
             prices[i] = realloc(prices[i], (noOfSpecialities[i] + 1) * sizeof(double));
             foods[i][noOfSpecialities[i]] = (char *) malloc(MAX_FOOD_NAME * sizeof(char));
             readUntil(foods[i][noOfSpecialities[i]], s, '-', &j);
-            if (isalpha(s[j])) {
+            while (isalpha(s[j])) {
                 readUntil(aux, s, '-', &j);
                 strcat(foods[i][noOfSpecialities[i]], "-");
                 strcat(foods[i][noOfSpecialities[i]], aux);
@@ -83,7 +83,7 @@ int main() {
         drink[i] = (char *) malloc(MAX_DRINK_NAME * sizeof(char));
         readUntil(aux, s, '(', &j);
         readUntil(drink[i], s, '-', &j);
-        if (isalpha(s[j])) {
+        while (isalpha(s[j])) {
             readUntil(aux, s, '-', &j);
             strcat(drink[i], "-");
             strcat(drink[i], aux);
@@ -180,8 +180,8 @@ int main() {
         else printf("Order confirmed! Thank you for buying from us, %s!", Username);
     };
 
-    for (i = 0; i < nrOfFoods; i++) {
-        for (j = 0; j < noOfSpecialities[i]; j++)
+    for (int i = 0; i < nrOfFoods; i++) {
+        for (int j = 0; j < noOfSpecialities[i]; j++)
             free(foods[i][j]);
         free(prices[i]);
         free(foodOptions[i]);
@@ -191,13 +191,13 @@ int main() {
     free(foodOptions);
     free(foods);
 
-    for (i = 0; i < nrOfDrinks; i++)
+    for (int i = 0; i < nrOfDrinks; i++)
         free(drink[i]);
     free(drink);
     free(drinkPrices);
 
-    for (i = 0; i < noOfUsers; i++) {
-        for (j = 0; j < 2; j++)
+    for (int i = 0; i < noOfUsers; i++) {
+        for (int j = 0; j < 2; j++)
             free(userDataBase[i][j]);
         free(userDataBase[i]);
     }
@@ -233,6 +233,7 @@ int fileExists(char *fileName) {
     }
     return 0;
 }
+
 
 
 
