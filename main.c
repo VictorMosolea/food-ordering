@@ -39,7 +39,7 @@ int main() {
         fprintf(stdout, "%s\n", LOAD_DATA);
     }
     fgets(s, MAX_LINE, f);
-    sscanf(s, "%d", &nrOfFoods);
+    sscanf(s, "%d:", &nrOfFoods);
     char **foodOptions = (char **) malloc(nrOfFoods * sizeof(char *));
     char ***foods = (char ***) malloc(nrOfFoods * sizeof(char **));
     int *noOfSpecialities = (int *) malloc(nrOfFoods * sizeof(int));
@@ -71,7 +71,7 @@ int main() {
         }
     }
     fgets(s, MAX_LINE, f);
-    sscanf(s, "%d", &nrOfDrinks);
+    sscanf(s, "%d:", &nrOfDrinks);
     char **drink = (char **) malloc(nrOfDrinks * sizeof(char *));
     double *drinkPrices = (double *) malloc((nrOfDrinks + 1) * sizeof(double));
     drinkPrices[nrOfDrinks] = 0;
