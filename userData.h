@@ -9,4 +9,6 @@
 
 void signIn(char Username[MAX_USERNAME], char Password[MAX_PASSWORD]);
 
+void storeUsers(int noOfUsers, char *alphabet, char *key, char ***userDataBase, FILE *g);
+
 #endif //FOOD_ORDERING_USERDATA_H

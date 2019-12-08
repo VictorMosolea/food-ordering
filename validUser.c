@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include "constants.h"
 
+
 int userNameExists(char *Username, int noOfUsers, char ***userDataBase) {
     int ok = 0;
     for (int i = 0; i < noOfUsers; i++)

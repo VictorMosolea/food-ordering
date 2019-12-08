@@ -4,33 +4,34 @@
 #include "order.h"
 #include "constants.h"
 #include <stdlib.h>
-#include <string.h>
 #include "validPassword.h"
 #include "validUser.h"
-#include <ctype.h>
+#include "crypto.h"
+#include "menuData.h"
+#include <string.h>
 
 int getChoiceIndex();
 
-void readUntil(char *sentence, char *text, char sep, int *i);
-
 int fileExists(char *fileName);
+
+void
+freeMemory(int nrOfFoods, int *noOfSpecialities, char ***foods, double **prices, char **foodOptions, int nrOfDrinks,
+           char **drink, double *drinkPrices,
+           int noOfUsers, char ***userDataBase);
 
 int main() {
     int cutleryChoice, drinksChoice, nrOfFoods, nrOfDrinks, foodsChoice, specialityChoice, introChoice, noOfUsers = 0;
     char YesNo[][4] = {"Yes", "No"};
-    char ***userDataBase = (char ***) malloc(noOfUsers * sizeof(char **));
     char s[MAX_LINE];
     FILE *g;
-    g = fopen("userDataBase.txt", "a+");
-    while (feof(g) == 0) {
-        noOfUsers++;
-        userDataBase = realloc(userDataBase, noOfUsers * sizeof(char **));
-        userDataBase[noOfUsers - 1] = (char **) malloc(2 * sizeof(char *));
-        userDataBase[noOfUsers - 1][0] = (char *) malloc(MAX_USERNAME * sizeof(char));
-        userDataBase[noOfUsers - 1][1] = (char *) malloc(MAX_PASSWORD * sizeof(char));
-        fgets(s, MAX_LINE, g);
-        sscanf(s, "%s %s", userDataBase[noOfUsers - 1][0], userDataBase[noOfUsers - 1][1]);
-    }
+    g = fopen("userDataBase.txt", "r+");
+    char alphabet[MAX_LINE], key[MAX_LINE];
+    fscanf(g, "%s %s", alphabet, key);
+    fgetc(g);
+    fgets(s, MAX_LINE, g);
+    sscanf(s, "%d", &noOfUsers);
+    char ***userDataBase = (char ***) malloc(noOfUsers * sizeof(char **));
+    storeUsers(noOfUsers, alphabet, key, userDataBase, g);
     FILE *f;
     if (fileExists("data.txt") == 1)
         f = fopen("data.txt", "r");
@@ -38,61 +39,22 @@ int main() {
         f = stdin;
         fprintf(stdout, "%s\n", LOAD_DATA);
     }
+    //storing menu data
     fgets(s, MAX_LINE, f);
     sscanf(s, "%d:", &nrOfFoods);
     char **foodOptions = (char **) malloc(nrOfFoods * sizeof(char *));
     char ***foods = (char ***) malloc(nrOfFoods * sizeof(char **));
     int *noOfSpecialities = (int *) malloc(nrOfFoods * sizeof(int));
     double **prices = (double **) malloc(nrOfFoods * sizeof(double *));
-    for (int i = 0; i < nrOfFoods; i++) {
-        foodOptions[i] = (char *) malloc(MAX_FOOD_NAME * sizeof(char));
-        fgets(s, MAX_LINE, f);
-        s[strlen(s) - 1] = '\0';
-        int j = 0;
-        readUntil(foodOptions[i], s, ':', &j);
-        noOfSpecialities[i] = 0;
-        foods[i] = (char **) malloc((noOfSpecialities[i] + 1) * sizeof(char *));
-        prices[i] = (double *) malloc((noOfSpecialities[i] + 1) * sizeof(double));
-        while (j < strlen(s)) {
-            char aux[MAX_LINE];
-            readUntil(aux, s, '(', &j);
-            foods[i] = realloc(foods[i], (noOfSpecialities[i] + 1) * sizeof(char *));
-            prices[i] = realloc(prices[i], (noOfSpecialities[i] + 1) * sizeof(double));
-            foods[i][noOfSpecialities[i]] = (char *) malloc(MAX_FOOD_NAME * sizeof(char));
-            readUntil(foods[i][noOfSpecialities[i]], s, '-', &j);
-            while (isalpha(s[j])) {
-                readUntil(aux, s, '-', &j);
-                strcat(foods[i][noOfSpecialities[i]], "-");
-                strcat(foods[i][noOfSpecialities[i]], aux);
-            }
-            readUntil(aux, s, ')', &j);
-            sscanf(aux, " %lf", &prices[i][noOfSpecialities[i]]);
-            noOfSpecialities[i]++;
-        }
-    }
+    storeFoodData(nrOfFoods, foods, foodOptions, noOfSpecialities, prices, f);
     fgets(s, MAX_LINE, f);
     sscanf(s, "%d:", &nrOfDrinks);
     char **drink = (char **) malloc(nrOfDrinks * sizeof(char *));
     double *drinkPrices = (double *) malloc((nrOfDrinks + 1) * sizeof(double));
     drinkPrices[nrOfDrinks] = 0;
-    fgets(s, MAX_LINE, f);
-    s[strlen(s) - 1] = '\0';
-    int j = 0, i = 0;
-    while (j < strlen(s)) {
-        char aux[MAX_LINE];
-        drink[i] = (char *) malloc(MAX_DRINK_NAME * sizeof(char));
-        readUntil(aux, s, '(', &j);
-        readUntil(drink[i], s, '-', &j);
-        while (isalpha(s[j])) {
-            readUntil(aux, s, '-', &j);
-            strcat(drink[i], "-");
-            strcat(drink[i], aux);
-        }
-        readUntil(aux, s, ',', &j);
-        sscanf(aux, " %lf)", &drinkPrices[i]);
-        i++;
-    }
+    storeDrinkData(drink, drinkPrices, f);
     char Username[MAX_USERNAME], Password[MAX_PASSWORD], userInput[MAX_LINE];
+
     printf("Welcome to Food Thingies!\n");
     Intro:
     {
@@ -129,7 +91,13 @@ int main() {
                     goto PasswordError;
                 if (passwordContainsDigits(Password) == 0)
                     goto PasswordError;
+                noOfUsers++;
+                encryptPassword(Password, alphabet, key);
+                fgetc(g);
+                fseek(g, 0, SEEK_END);
                 fprintf(g, "\n%s %s", Username, Password);
+                fseek(g, strlen(alphabet) + strlen(key) + 3, SEEK_SET);
+                fprintf(g, "%d", noOfUsers);
                 goto Food;
             };
     };
@@ -180,6 +148,33 @@ int main() {
         else printf("Order confirmed! Thank you for buying from us, %s!", Username);
     };
 
+    freeMemory(nrOfFoods, noOfSpecialities, foods, prices, foodOptions, nrOfDrinks, drink, drinkPrices, noOfUsers,
+               userDataBase);
+
+    return 0;
+}
+
+int getChoiceIndex() {
+    char choice;
+    choice = getchar();
+    getchar();
+    int choiceIndex = choice - 'a';
+    return choiceIndex;
+}
+
+int fileExists(char *fileName) {
+    FILE *file;
+    if ((file = fopen(fileName, "r"))) {
+        fclose(file);
+        return 1;
+    }
+    return 0;
+}
+
+void
+freeMemory(int nrOfFoods, int *noOfSpecialities, char ***foods, double **prices, char **foodOptions, int nrOfDrinks,
+           char **drink, double *drinkPrices,
+           int noOfUsers, char ***userDataBase) {
     for (int i = 0; i < nrOfFoods; i++) {
         for (int j = 0; j < noOfSpecialities[i]; j++)
             free(foods[i][j]);
@@ -202,37 +197,10 @@ int main() {
         free(userDataBase[i]);
     }
     free(userDataBase);
-
-    return 0;
 }
 
-int getChoiceIndex() {
-    char choice;
-    choice = getchar();
-    getchar();
-    int choiceIndex = choice - 'a';
-    return choiceIndex;
-}
 
-void readUntil(char *sentence, char *text, char sep, int *i) {
-    int j = 0;
-    while (text[*i] != sep && (*i) < strlen(text)) {
-        sentence[j] = text[*i];
-        (*i)++;
-        j++;
-    }
-    sentence[j] = '\0';
-    (*i)++;
-}
 
-int fileExists(char *fileName) {
-    FILE *file;
-    if ((file = fopen(fileName, "r"))) {
-        fclose(file);
-        return 1;
-    }
-    return 0;
-}
 
 
 
