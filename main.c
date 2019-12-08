@@ -14,8 +14,7 @@ int getChoiceIndex();
 
 int fileExists(char *fileName);
 
-void
-freeMemory(int nrOfFoods, int *noOfSpecialities, char ***foods, double **prices, char **foodOptions, int nrOfDrinks,
+void freeMemory(int nrOfFoods, int *noOfSpecialities, char ***foods, double **prices, char **foodOptions, int nrOfDrinks,
            char **drink, double *drinkPrices,
            int noOfUsers, char ***userDataBase);
 
