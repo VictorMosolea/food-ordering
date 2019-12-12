@@ -14,12 +14,13 @@ int getChoiceIndex();
 
 int fileExists(char *fileName);
 
-void freeMemory(int nrOfFoods, int *noOfSpecialities, char ***foods, double **prices, char **foodOptions, int nrOfDrinks,
+void
+freeMemory(int nrOfFoods, int *noOfSpecialities, char ***foods, double **prices, char **foodOptions, int nrOfDrinks,
            char **drink, double *drinkPrices,
            int noOfUsers, char ***userDataBase);
 
 int main() {
-    int cutleryChoice, drinksChoice, nrOfFoods, nrOfDrinks, foodsChoice, specialityChoice, introChoice, noOfUsers = 0;
+    int cutleryChoice, drinksChoice, nrOfFoods, nrOfDrinks, foodsChoice, specialityChoice, introChoice, noOfUsers, newUser = 0;
     char YesNo[][4] = {"Yes", "No"};
     char s[MAX_LINE];
     FILE *g;
@@ -76,7 +77,7 @@ int main() {
                 printf("%s\n", SIGNING_UP);
                 printf("Username:\n>");
                 gets(Username);
-                printf("Password:\n");
+                printf("Password:\n>");
                 PasswordError:
                 printf(">");
                 gets(Password);
@@ -90,13 +91,7 @@ int main() {
                     goto PasswordError;
                 if (passwordContainsDigits(Password) == 0)
                     goto PasswordError;
-                noOfUsers++;
-                encryptPassword(Password, alphabet, key);
-                fgetc(g);
-                fseek(g, 0, SEEK_END);
-                fprintf(g, "\n%s %s", Username, Password);
-                fseek(g, strlen(alphabet) + strlen(key) + 3, SEEK_SET);
-                fprintf(g, "%d", noOfUsers);
+                newUser = 1;
                 goto Food;
             };
     };
@@ -104,9 +99,11 @@ int main() {
     {
         printFoodOptions(nrOfFoods, foodOptions);
         foodsChoice = getChoiceIndex();
-        if (foodsChoice == nrOfFoods)
+        if (foodsChoice == nrOfFoods) {
+            if (newUser == 1)
+                newUser = 0;
             goto Intro;
-        else goto FoodPick;
+        } else goto FoodPick;
     };
     FoodPick:
     {
@@ -146,10 +143,20 @@ int main() {
             goto Cutlery;
         else printf("Order confirmed! Thank you for buying from us, %s!", Username);
     };
+    if (newUser == 1) {
+        noOfUsers++;
+        encryptPassword(Password, alphabet, key);
+        fgetc(g);
+        fseek(g, strlen(alphabet) + strlen(key) + 3, SEEK_SET);
+        fprintf(g, "%d", noOfUsers);
+        fclose(g);
+        g = fopen("userDataBase.txt", "a+");
+        fprintf(g, "\n%s %s", Username, Password);
+    }
 
-    freeMemory(nrOfFoods, noOfSpecialities, foods, prices, foodOptions, nrOfDrinks, drink, drinkPrices, noOfUsers,
-               userDataBase);
-
+    freeMemory(nrOfFoods, noOfSpecialities, foods, prices, foodOptions, nrOfDrinks,
+               drink, drinkPrices,
+               noOfUsers, userDataBase);
     return 0;
 }
 
@@ -184,20 +191,20 @@ freeMemory(int nrOfFoods, int *noOfSpecialities, char ***foods, double **prices,
     free(prices);
     free(foodOptions);
     free(foods);
+    free(noOfSpecialities);
 
     for (int i = 0; i < nrOfDrinks; i++)
         free(drink[i]);
     free(drink);
     free(drinkPrices);
 
-    for (int i = 0; i < noOfUsers; i++) {
+    /*for (int i = 0; i < noOfUsers; i++) {
         for (int j = 0; j < 2; j++)
             free(userDataBase[i][j]);
         free(userDataBase[i]);
     }
-    free(userDataBase);
+    free(userDataBase);*/ //this doesn't work for some reason
 }
-
 
 
 

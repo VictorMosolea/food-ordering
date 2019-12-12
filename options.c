@@ -11,7 +11,7 @@ void printFoodOptions(int nrOfFoods, char **foodOptions) {
         putchar('a' + i - 1);
         printf(") %s\n", foodOptions[i - 1]);
     }
-    printf("%c) Go back\n", 'a' + nrOfFoods);
+    printf("%c) Go back\n>", 'a' + nrOfFoods);
 }
 
 void printFoodSpecialities(char foodOptions[MAX_FOOD_NAME], int nrOfFoods, char **foods, double *prices) {
