@@ -3,12 +3,16 @@
 //
 #ifndef FOOD_ORDERING_OPTIONS_H
 #define FOOD_ORDERING_OPTIONS_H
+
 #include "constants.h"
 
-void printFoodOptions(int nrOfFoods, char foodOptions[][MAX_FOOD_NAME]);
-void printFoodSpecialities(char foodOptions[MAX_FOOD_NAME], int nrOfFoods, char foods[MAX_NR_FOODS][MAX_FOOD_NAME],
-                           int prices[MAX_NR_FOODS]);
-void printDrinkOptions(char foodOptions[MAX_FOOD_NAME], int nrOfDrinks, int drinkPrices[MAX_NR_DRINKS], char drink[MAX_NR_DRINKS][MAX_DRINK_NAME]);
+void printFoodOptions(int nrOfFoods, char **foodOptions);
+
+void printFoodSpecialities(char foodOptions[MAX_FOOD_NAME], int nrOfFoods, char **foods,
+                           double *prices);
+
+void printDrinkOptions(char foodOptions[MAX_FOOD_NAME], int nrOfDrinks, double *drinkPrices, char **drink);
+
 void printCutleryOptions();
 
 
