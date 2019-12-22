@@ -145,7 +145,7 @@ int main() {
         fprintf(g, "\n%s %s", u.Username, u.Password);
     }
 
-    //freeMemory(u, userDataBase, foodOptions, drinks, noOfUsers, noOfFoods, noOfDrinks);
+    freeMemory(u, userDataBase, foodOptions, drinks, noOfUsers, noOfFoods, noOfDrinks);
 
     return 0;
 }
