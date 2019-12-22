@@ -4,12 +4,12 @@
 #include <string.h>
 #include <stdio.h>
 #include "constants.h"
+#include "userData.h"
 
-
-int userNameExists(char *Username, int noOfUsers, char ***userDataBase) {
+int userNameExists(char *Username, int noOfUsers, user *userDataBase) {
     int ok = 0;
     for (int i = 0; i < noOfUsers; i++)
-        if (strcmp(Username, userDataBase[i][0]) == 0)
+        if (strcmp(Username, userDataBase[i].Username) == 0)
             ok = 1;
     if (ok == 0) {
         printf("%s\n", USER_NOT_FOUND);
@@ -17,10 +17,10 @@ int userNameExists(char *Username, int noOfUsers, char ***userDataBase) {
     }
 }
 
-int passwordCorrect(char *Password, int noOfUsers, char ***userDataBase) {
+int passwordCorrect(char *Password, int noOfUsers, user *userDataBase) {
     int ok = 0;
     for (int i = 0; i < noOfUsers; i++)
-        if (strcmp(Password, userDataBase[i][1]) == 0)
+        if (strcmp(Password, userDataBase[i].Password) == 0)
             ok = 1;
     if (ok == 0) {
         printf("%s\n", INCORRECT_PASSWORD);
@@ -28,9 +28,9 @@ int passwordCorrect(char *Password, int noOfUsers, char ***userDataBase) {
     }
 }
 
-int validUsername(char *Username, char ***userDataBase, int noOfUsers) {
+int validUsername(char *Username, user *userDataBase, int noOfUsers) {
     for (int i = 0; i < noOfUsers; i++)
-        if (strcmp(Username, userDataBase[i][0]) == 0) {
+        if (strcmp(Username, userDataBase[i].Username) == 0) {
             printf("%s\n", DUPLICATE_USER);
             return 0;
         }

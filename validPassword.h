@@ -5,7 +5,7 @@
 #ifndef FOOD_ORDERING_VALIDPASSWORD_H
 #define FOOD_ORDERING_VALIDPASSWORD_H
 
-int noUsernameInPassword(char *Username, char *Password);
+int noUsernameInPassword(user u);
 
 int passwordLacksChars(char *Password);
 

@@ -5,16 +5,15 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include "userData.h"
 
-void lowerString(char *string);
-
-int noUsernameInPassword(char *Username, char *Password) {
+int noUsernameInPassword(user u) {
     char lowerPassword[MAX_PASSWORD];
-    strcpy(lowerPassword, Password);
+    strcpy(lowerPassword, u.Password);
     char lowerUsername[MAX_USERNAME];
-    strcpy(lowerUsername, Username);
-    lowerString(lowerUsername);
-    lowerString(lowerPassword);
+    strcpy(lowerUsername, u.Username);
+    strlwr(lowerUsername);
+    strlwr(lowerPassword);
     if (strstr(lowerPassword, lowerUsername) != NULL) {
         printf("%s\n", ERROR_PASSWORD_NOT_USERNAME);
         return 0;
@@ -50,9 +49,4 @@ int passwordLongEnough(char *Password) {
         return 0;
     }
     return 1;
-}
-
-void lowerString(char *string) {
-    for (int i = 0; i < strlen(string); i++)
-        string[i] = tolower(string[i]);
 }

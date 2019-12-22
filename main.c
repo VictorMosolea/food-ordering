@@ -14,13 +14,10 @@ int getChoiceIndex();
 
 int fileExists(char *fileName);
 
-void
-freeMemory(int nrOfFoods, int *noOfSpecialities, char ***foods, double **prices, char **foodOptions, int nrOfDrinks,
-           char **drink, double *drinkPrices,
-           int noOfUsers, char ***userDataBase);
+void freeMemory(user u, user *userDataBase, foods *foodOptions, drink *drinks, int noOfUsers, int nrOfFoods, int nrOfDrinks);
 
 int main() {
-    int cutleryChoice, drinksChoice, nrOfFoods, nrOfDrinks, foodsChoice, specialityChoice, introChoice, noOfUsers, newUser = 0;
+    int cutleryChoice, drinksChoice, noOfFoods, noOfDrinks, foodsChoice, specialityChoice, introChoice, noOfUsers, newUser = 0;
     char YesNo[][4] = {"Yes", "No"};
     char s[MAX_LINE];
     FILE *g;
@@ -30,8 +27,8 @@ int main() {
     fgetc(g);
     fgets(s, MAX_LINE, g);
     sscanf(s, "%d", &noOfUsers);
-    char ***userDataBase = (char ***) malloc(noOfUsers * sizeof(char **));
-    storeUsers(noOfUsers, alphabet, key, userDataBase, g);
+    user *userDataBase;
+    storeUsers(noOfUsers, alphabet, key, &userDataBase, g);
     FILE *f;
     if (fileExists("data.txt") == 1)
         f = fopen("data.txt", "r");
@@ -41,33 +38,28 @@ int main() {
     }
     //storing menu data
     fgets(s, MAX_LINE, f);
-    sscanf(s, "%d:", &nrOfFoods);
-    char **foodOptions = (char **) malloc(nrOfFoods * sizeof(char *));
-    char ***foods = (char ***) malloc(nrOfFoods * sizeof(char **));
-    int *noOfSpecialities = (int *) malloc(nrOfFoods * sizeof(int));
-    double **prices = (double **) malloc(nrOfFoods * sizeof(double *));
-    storeFoodData(nrOfFoods, foods, foodOptions, noOfSpecialities, prices, f);
+    sscanf(s, "%d:", &noOfFoods);
+    foods *foodOptions = (foods *) malloc(noOfFoods * sizeof(foods));
+    storeFoodData(noOfFoods, f, foodOptions);
     fgets(s, MAX_LINE, f);
-    sscanf(s, "%d:", &nrOfDrinks);
-    char **drink = (char **) malloc(nrOfDrinks * sizeof(char *));
-    double *drinkPrices = (double *) malloc((nrOfDrinks + 1) * sizeof(double));
-    drinkPrices[nrOfDrinks] = 0;
-    storeDrinkData(drink, drinkPrices, f);
-    char Username[MAX_USERNAME], Password[MAX_PASSWORD], userInput[MAX_LINE];
-
+    sscanf(s, "%d:", &noOfDrinks);
+    drink *drinks = (drink *) malloc((noOfDrinks) + 1 * sizeof(drink));
+    storeDrinkData(f, drinks);
+    char userInput[MAX_LINE];
     printf("Welcome to Food Thingies!\n");
+    user u = createUser();
     Intro:
     {
         printf("%s\na) %s\nb) %s\n>", SIGN_IN_UP, SIGN_IN, SIGN_UP);
         introChoice = getChoiceIndex();
         if (introChoice == 0) {
-            signIn(Username, Password);
-            if (userNameExists(Username, noOfUsers, userDataBase) == 0)
+            signIn(&u);
+            if (userNameExists(u.Username, noOfUsers, userDataBase) == 0)
                 goto Intro;
             IncorrectPassword:
-            if (passwordCorrect(Password, noOfUsers, userDataBase) == 0) {
+            if (passwordCorrect(u.Password, noOfUsers, userDataBase) == 0) {
                 printf("Password:\n");
-                gets(Password);
+                gets(u.Password);
                 goto IncorrectPassword;
             }
             goto Food;
@@ -76,20 +68,19 @@ int main() {
             {
                 printf("%s\n", SIGNING_UP);
                 printf("Username:\n>");
-                gets(Username);
+                gets(u.Username);
                 printf("Password:\n>");
                 PasswordError:
-                printf(">");
-                gets(Password);
-                if (validUsername(Username, userDataBase, noOfUsers) == 0)
+                gets(u.Password);
+                if (validUsername(u.Username, userDataBase, noOfUsers) == 0)
                     goto SignUp;
-                if (passwordLongEnough(Password) == 0)
+                if (passwordLongEnough(u.Password) == 0)
                     goto PasswordError;
-                if (noUsernameInPassword(Username, Password) == 0)
+                if (noUsernameInPassword(u) == 0)
                     goto PasswordError;
-                if (passwordLacksChars(Password) == 1)
+                if (passwordLacksChars(u.Password) == 1)
                     goto PasswordError;
-                if (passwordContainsDigits(Password) == 0)
+                if (passwordContainsDigits(u.Password) == 0)
                     goto PasswordError;
                 newUser = 1;
                 goto Food;
@@ -97,9 +88,9 @@ int main() {
     };
     Food:
     {
-        printFoodOptions(nrOfFoods, foodOptions);
+        printFoodOptions(noOfFoods, foodOptions);
         foodsChoice = getChoiceIndex();
-        if (foodsChoice == nrOfFoods) {
+        if (foodsChoice == noOfFoods) {
             if (newUser == 1)
                 newUser = 0;
             goto Intro;
@@ -107,18 +98,17 @@ int main() {
     };
     FoodPick:
     {
-        printFoodSpecialities(foodOptions[foodsChoice], noOfSpecialities[foodsChoice], foods[foodsChoice],
-                              prices[foodsChoice]);
+        printFoodSpecialities(foodOptions[foodsChoice], foodOptions[foodsChoice].noOfSpecialities);
         specialityChoice = getChoiceIndex();
-        if (specialityChoice == noOfSpecialities[foodsChoice])
+        if (specialityChoice == foodOptions[foodsChoice].noOfSpecialities)
             goto Food;
         else goto DrinkPick;
     };
     DrinkPick:
     {
-        printDrinkOptions(foodOptions[foodsChoice], nrOfDrinks, drinkPrices, drink);
+        printDrinkOptions(foodOptions[foodsChoice].name, noOfDrinks, drinks);
         drinksChoice = getChoiceIndex();
-        if (drinksChoice == nrOfDrinks + 1)
+        if (drinksChoice == noOfDrinks + 1)
             goto FoodPick;
         else goto Cutlery;
     };
@@ -134,29 +124,29 @@ int main() {
     {
         printf("Any additional info?\n");
         gets(userInput);
-        printUserOrder(Username, foodOptions[foodsChoice], foods[foodsChoice][specialityChoice],
-                       YesNo[cutleryChoice], prices[foodsChoice][specialityChoice], drink[drinksChoice], userInput,
-                       drinkPrices[drinksChoice]);
+        printUserOrder(u.Username, foodOptions[foodsChoice].name,
+                       foodOptions[foodsChoice].specialities[specialityChoice].name,
+                       YesNo[cutleryChoice], foodOptions[foodsChoice].specialities[specialityChoice].price, userInput,
+                       drinks[drinksChoice]);
         printf("a) Confirm order\nb) Go back\n>");
         int choice = getChoiceIndex();
         if (choice == 1)
             goto Cutlery;
-        else printf("Order confirmed! Thank you for buying from us, %s!", Username);
+        else printf("Order confirmed! Thank you for buying from us, %s!", u.Username);
     };
     if (newUser == 1) {
         noOfUsers++;
-        encryptPassword(Password, alphabet, key);
+        encryptPassword(u.Password, alphabet, key);
         fgetc(g);
         fseek(g, strlen(alphabet) + strlen(key) + 3, SEEK_SET);
         fprintf(g, "%d", noOfUsers);
         fclose(g);
         g = fopen("userDataBase.txt", "a+");
-        fprintf(g, "\n%s %s", Username, Password);
+        fprintf(g, "\n%s %s", u.Username, u.Password);
     }
 
-    freeMemory(nrOfFoods, noOfSpecialities, foods, prices, foodOptions, nrOfDrinks,
-               drink, drinkPrices,
-               noOfUsers, userDataBase);
+    //freeMemory(u, userDataBase, foodOptions, drinks, noOfUsers, noOfFoods, noOfDrinks);
+
     return 0;
 }
 
@@ -177,34 +167,26 @@ int fileExists(char *fileName) {
     return 0;
 }
 
-void
-freeMemory(int nrOfFoods, int *noOfSpecialities, char ***foods, double **prices, char **foodOptions, int nrOfDrinks,
-           char **drink, double *drinkPrices,
-           int noOfUsers, char ***userDataBase) {
-    for (int i = 0; i < nrOfFoods; i++) {
-        for (int j = 0; j < noOfSpecialities[i]; j++)
-            free(foods[i][j]);
-        free(prices[i]);
-        free(foodOptions[i]);
-        free(foods[i]);
-    }
-    free(prices);
-    free(foodOptions);
-    free(foods);
-    free(noOfSpecialities);
-
-    for (int i = 0; i < nrOfDrinks; i++)
-        free(drink[i]);
-    free(drink);
-    free(drinkPrices);
-
+void freeMemory(user u, user *userDataBase, foods *foodOptions, drink *drinks, int noOfUsers, int noOfFoods, int noOfDrinks) {
+    free(u.Username);
+    free(u.Password);
     /*for (int i = 0; i < noOfUsers; i++) {
-        for (int j = 0; j < 2; j++)
-            free(userDataBase[i][j]);
-        free(userDataBase[i]);
+        free(userDataBase[i].Username);
+        free(userDataBase[i].Password);
+    }*/ //this doesn't work for some reason
+    free(userDataBase);
+    for (int i = 0; i < noOfFoods; i++) {
+        for (int j = 0; j < foodOptions[i].noOfSpecialities; j++)
+            free(foodOptions[i].specialities[j].name);
+        free(foodOptions[i].specialities);
+        free(foodOptions[i].name);
     }
-    free(userDataBase);*/ //this doesn't work for some reason
+    free(foodOptions);
+    for(int i=0;i<noOfDrinks;i++)
+        free(drinks[i].name);
+    free(drinks);
 }
+
 
 
 

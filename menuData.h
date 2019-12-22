@@ -4,10 +4,34 @@
 
 #ifndef FOOD_ORDERING_MENUDATA_H
 #define FOOD_ORDERING_MENUDATA_H
+
 #include <stdio.h>
 
-void storeFoodData(int nrOfFoods, char ***foods, char **foodOptions, int *noOfSpecialities, double **prices, FILE *f);
 
-void storeDrinkData(char **drink, double *drinkPrices, FILE *f);
+typedef struct speciality {
+    char *name;
+    double price;
+} speciality;
+
+typedef struct foods {
+    char *name;
+    int noOfSpecialities;
+    speciality *specialities;
+} foods;
+
+typedef struct drink {
+    char *name;
+    double price;
+} drink;
+
+speciality createSpeciality();
+
+foods createFoods();
+
+drink createDrink();
+
+void storeFoodData(int nrOfFoods, FILE *f, foods *foodOptions);
+
+void storeDrinkData(FILE *f, drink *drinks);
 
 #endif //FOOD_ORDERING_MENUDATA_H

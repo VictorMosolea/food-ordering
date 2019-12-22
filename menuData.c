@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include "menuData.h"
+
 void readUntil(char *sentence, char *text, char sep, int *i) {
     int j = 0;
     while (text[*i] != sep && (*i) < strlen(text)) {
@@ -17,54 +19,74 @@ void readUntil(char *sentence, char *text, char sep, int *i) {
     (*i)++;
 }
 
-void storeFoodData(int nrOfFoods, char ***foods, char **foodOptions, int *noOfSpecialities, double **prices, FILE *f) {
+speciality createSpeciality() {
+    speciality s;
+    s.name = (char *) malloc(MAX_FOOD_NAME * sizeof(char));
+    return s;
+}
+
+foods createFoods() {
+    foods f;
+    f.name = (char *) malloc(MAX_FOOD_NAME * sizeof(char));
+    return f;
+}
+
+drink createDrink() {
+    drink d;
+    d.name = (char *) malloc(MAX_DRINK_NAME * sizeof(char));
+    return d;
+}
+
+void storeFoodData(int nrOfFoods, FILE *f, foods *foodOptions) {
     char s[MAX_LINE];
     for (int i = 0; i < nrOfFoods; i++) {
-        foodOptions[i] = (char *) malloc(MAX_FOOD_NAME * sizeof(char));
+        foodOptions[i] = createFoods();
         fgets(s, MAX_LINE, f);
         s[strlen(s) - 1] = '\0';
         int j = 0;
-        readUntil(foodOptions[i], s, ':', &j);
-        noOfSpecialities[i] = 0;
-        foods[i] = (char **) malloc((noOfSpecialities[i] + 1) * sizeof(char *));
-        prices[i] = (double *) malloc((noOfSpecialities[i] + 1) * sizeof(double));
+        readUntil(foodOptions[i].name, s, ':', &j);
+        foodOptions[i].noOfSpecialities = 0;
+        foodOptions[i].specialities = (speciality *) malloc((foodOptions[i].noOfSpecialities + 1) * sizeof(speciality));
         while (j < strlen(s)) {
             char aux[MAX_LINE];
             readUntil(aux, s, '(', &j);
-            foods[i] = realloc(foods[i], (noOfSpecialities[i] + 1) * sizeof(char *));
-            prices[i] = realloc(prices[i], (noOfSpecialities[i] + 1) * sizeof(double));
-            foods[i][noOfSpecialities[i]] = (char *) malloc(MAX_FOOD_NAME * sizeof(char));
-            readUntil(foods[i][noOfSpecialities[i]], s, '-', &j);
+            foodOptions[i].specialities = realloc(foodOptions[i].specialities,
+                                                  (foodOptions[i].noOfSpecialities + 1) * sizeof(speciality));
+            foodOptions[i].specialities[foodOptions[i].noOfSpecialities] = createSpeciality();
+            readUntil(foodOptions[i].specialities[foodOptions[i].noOfSpecialities].name, s, '-', &j);
             while (isalpha(s[j])) {
                 readUntil(aux, s, '-', &j);
-                strcat(foods[i][noOfSpecialities[i]], "-");
-                strcat(foods[i][noOfSpecialities[i]], aux);
+                strcat(foodOptions[i].specialities[foodOptions[i].noOfSpecialities].name, "-");
+                strcat(foodOptions[i].specialities[foodOptions[i].noOfSpecialities].name, aux);
             }
             readUntil(aux, s, ')', &j);
-            sscanf(aux, " %lf", &prices[i][noOfSpecialities[i]]);
-            noOfSpecialities[i]++;
+            sscanf(aux, " %lf", &foodOptions[i].specialities[foodOptions[i].noOfSpecialities].price);
+            foodOptions[i].noOfSpecialities++;
         }
     }
 }
 
-void storeDrinkData(char **drink, double *drinkPrices, FILE *f) {
+void storeDrinkData(FILE *f, drink *drinks) {
     char s[MAX_LINE];
     fgets(s, MAX_LINE, f);
     s[strlen(s) - 1] = '\0';
     int j = 0, i = 0;
     while (j < strlen(s)) {
         char aux[MAX_LINE];
-        drink[i] = (char *) malloc(MAX_DRINK_NAME * sizeof(char));
+        drinks[i] = createDrink();
         readUntil(aux, s, '(', &j);
-        readUntil(drink[i], s, '-', &j);
+        readUntil(drinks[i].name, s, '-', &j);
         while (isalpha(s[j])) {
             readUntil(aux, s, '-', &j);
-            strcat(drink[i], "-");
-            strcat(drink[i], aux);
+            strcat(drinks[i].name, "-");
+            strcat(drinks[i].name, aux);
         }
         readUntil(aux, s, ',', &j);
-        sscanf(aux, " %lf)", &drinkPrices[i]);
+        sscanf(aux, " %lf)", &drinks[i].price);
         i++;
     }
+    drinks[i] = createDrink();
+    drinks[i].name = "No";
+    drinks[i].price = 0;
 }
 

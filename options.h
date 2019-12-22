@@ -5,13 +5,13 @@
 #define FOOD_ORDERING_OPTIONS_H
 
 #include "constants.h"
+#include "menuData.h"
 
-void printFoodOptions(int nrOfFoods, char **foodOptions);
+void printFoodOptions(int nrOfFoods, foods *foodOptions);
 
-void printFoodSpecialities(char foodOptions[MAX_FOOD_NAME], int nrOfFoods, char **foods,
-                           double *prices);
+void printFoodSpecialities(foods chosenFood, int nrOfFoods);
 
-void printDrinkOptions(char foodOptions[MAX_FOOD_NAME], int nrOfDrinks, double *drinkPrices, char **drink);
+void printDrinkOptions(char foodOptions[MAX_FOOD_NAME], int nrOfDrinks, drink *drinks);
 
 void printCutleryOptions();
 
