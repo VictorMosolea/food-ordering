@@ -3,33 +3,36 @@
 //
 #include <stdio.h>
 #include "constants.h"
+#include "menuData.h"
 
-void printFoodOptions(int nrOfFoods, char **foodOptions) {
+void printFoodOptions(int nrOfFoods, foods *foodOptions) {
     printf("Please choose the food you feel like eating today:\n");
 
     for (int i = 1; i <= nrOfFoods; i++) {
         putchar('a' + i - 1);
-        printf(") %s\n", foodOptions[i - 1]);
+        printf(") %s\n", foodOptions[i - 1].name);
     }
     printf("%c) Go back\n>", 'a' + nrOfFoods);
 }
 
-void printFoodSpecialities(char foodOptions[MAX_FOOD_NAME], int nrOfFoods, char **foods, double *prices) {
-    printf("Please choose the type of %s:\n", foodOptions);
+void printFoodSpecialities(foods chosenFood, int nrOfFoods) {
+    printf("Please choose the type of %s:\n", chosenFood.name);
     for (int i = 1; i <= nrOfFoods; i++) {
         putchar('a' + i - 1);
-        printf(") %s %.2lf\n", foods[i - 1], prices[i - 1]);
+        printf(") %s %.2lf\n", chosenFood.specialities[i - 1].name, chosenFood.specialities[i - 1].price);
     }
     printf("%c) Go back\n>", 'a' + nrOfFoods);
 }
 
-void printDrinkOptions(char foodOptions[MAX_FOOD_NAME], int nrOfDrinks, double *drinkPrices, char **drink) {
+void printDrinkOptions(char foodOptions[MAX_FOOD_NAME], int nrOfDrinks, drink *drinks) {
     printf("Please choose a drink to go with your %s:\n", foodOptions);
     for (int i = 1; i <= nrOfDrinks; i++) {
         putchar('a' + i - 1);
-        printf(") %s %.2lf\n", drink[i - 1], drinkPrices[i - 1]);
+        printf(") %s ", drinks[i - 1].name);
+        if (drinks[i - 1].price > 0)
+            printf("%.2lf\n", drinks[i - 1].price);
     }
-    printf("%c) No\n%c) Go back\n>", nrOfDrinks + 'a', nrOfDrinks + 1 + 'a');
+    printf("\n%c) Go back\n>", nrOfDrinks + 1 + 'a');
 }
 
 void printCutleryOptions() {

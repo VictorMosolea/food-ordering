@@ -7,8 +7,16 @@
 
 #include "constants.h"
 
-void signIn(char Username[MAX_USERNAME], char Password[MAX_PASSWORD]);
+typedef struct _user {
+    char *Username;
+    char *Password;
+} user;
 
-void storeUsers(int noOfUsers, char *alphabet, char *key, char ***userDataBase, FILE *g);
+void signIn(user *u);
+
+void storeUsers(int noOfUsers, char *alphabet, char *key, user **userDataBase, FILE *g);
+
+user createUser();
+
 
 #endif //FOOD_ORDERING_USERDATA_H

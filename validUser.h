@@ -5,10 +5,10 @@
 #ifndef FOOD_ORDERING_VALIDUSER_H
 #define FOOD_ORDERING_VALIDUSER_H
 
-int userNameExists(char *Username, int noOfUsers, char ***userDataBase);
+int userNameExists(char *Username, int noOfUsers, user *userDataBase);
 
-int passwordCorrect(char *Password, int noOfUsers, char ***userDataBase);
+int passwordCorrect(char *Password, int noOfUsers, user *userDataBase);
 
-int validUsername(char *Username, char ***userDataBase, int noOfUsers);
+int validUsername(char *Username, user *userDataBase, int noOfUsers);
 
 #endif //FOOD_ORDERING_VALIDUSER_H

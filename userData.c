@@ -4,22 +4,30 @@
 #include "constants.h"
 #include "crypto.h"
 #include <stdlib.h>
-void signIn(char Username[MAX_USERNAME], char Password[MAX_PASSWORD]) {
-    printf("%s\n", SIGNING_IN);
-    printf("---Username:\n>");
-    gets(Username);
-    printf("---Password:\n>");
-    gets(Password);
+#include "userData.h"
+
+user createUser() {
+    user u;
+    u.Username = (char *) malloc(MAX_USERNAME * sizeof(char));
+    u.Password = (char *) malloc(MAX_PASSWORD * sizeof(char));
+    return u;
 }
 
-void storeUsers(int noOfUsers, char *alphabet, char *key, char ***userDataBase, FILE *g) {
+void signIn(user *u) {
+    printf("%s\n", SIGNING_IN);
+    printf("---Username:\n>");
+    gets(u->Username);
+    printf("---Password:\n>");
+    gets(u->Password);
+}
+
+void storeUsers(int noOfUsers, char *alphabet, char *key, user **userDataBase, FILE *g) {
+    *userDataBase = (user *) malloc(noOfUsers * sizeof(user));
     char s[MAX_LINE];
-    for(int i=0;i<noOfUsers;i++){
+    for (int i = 0; i < noOfUsers; i++) {
+        (*userDataBase)[i] = createUser();
         fgets(s, MAX_LINE, g);
-        userDataBase[i] = (char **) malloc(2 * sizeof(char *));
-        userDataBase[i][0] = (char *) malloc(MAX_USERNAME * sizeof(char));
-        userDataBase[i][1] = (char *) malloc(MAX_PASSWORD * sizeof(char));
-        sscanf(s, "%s %s", userDataBase[i][0], userDataBase[i][1]);
-        decryptPassword(userDataBase[i][1], alphabet, key);
-     }
+        sscanf(s, "%s %s", (*userDataBase)[i].Username, (*userDataBase)[i].Password);
+        decryptPassword((*userDataBase)[i].Password, alphabet, key);
+    }
 }
